@@ -13,12 +13,22 @@
     <!--<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>-->
 </head>
 <style>
+    .btnZoom{
+        margin:20px;
+    }
+    .btnBlock{
+        text-align:center;
+    }
+/*
     .test5{
         fill: rgba(0, 139, 141,0.5);
     }
     .test4{
         fill: rgba(102, 117, 128, 0.5);
     }
+*/
+    
+    
     </style>
 <body>
 <div class="container col-lg-10 col-md-12 col-xs-12 col-lg-offset-1">
@@ -52,9 +62,9 @@
                 </div>
                 <div class="panel-body">
                     <p>You will first need to create the SVG that will contains the features.<br>
-                        To do so, give whithin the parameters, the sequence and the div in which the features will be
+                        To do so, give whithin the parameters, the sequence (or length) and the div in which the features will be
                         display.<br>
-                        You can also adjust some rendering options :</p>
+                        You can also adjust some <strong>rendering options</strong> :</p>
                     <ul>
                         <li><strong>showAxis</strong> <em>(boolean)</em> : Display or not the x-Axis</li>
                         <li><strong>showSequence</strong> <em>(boolean)</em> : Display or not the sequence</li>
@@ -67,6 +77,8 @@
                         <li><strong>zoomMax</strong> <em>(int)</em> : Define the maximum range of the zoom. Must be a
                             multiple of ten.
                         </li>
+                        <li><strong>animation</strong> <em>(boolean)</em> : Animation during transition</li>
+                        <li><strong>offset</strong> <em>(object)</em> : Specify an offset (offset.start should always be > 0). <br>Ex : <span style="font-family:monospace;background-color:#eee;">offset:{start:40,end:100}</span></li>
                     </ul>
                     <p>The brush zoom will allow you to select a part of the sequence to zoom in. <br>
                         It may happen that the div is too small to display the sequence, but a zoom will make it
@@ -80,6 +92,9 @@ var options = {showAxis: true, showSequence: true,
                brushActive: true, toolbar:true,
                bubbleHelp: true, zoomMax:20 };
 var ft = new FeatureViewer("FDSJKLFJDSFKLJDFHADJKLFHDSJKLFHDAFJKLDHFJKLDASFHDJKLFHDSAJKLFHDAKLFJDHSAFKLDLSNCDJKLFENFIUPERWDJKPCNVDDAAFJDSAKFL","#div1", options);
+
+//Or with a length instead of a sequence : 
+//var ft = new FeatureViewer(113,"#div1",options);
         </textarea>
                 </form>
                 <button type="button" class="btn btn-default center-block" style="margin-bottom:20px;"
@@ -124,8 +139,11 @@ var ft = new FeatureViewer("FDSJKLFJDSFKLJDFHADJKLFHDSJKLFHDAFJKLDHFJKLDASFHDJKL
                             for a
                             specific rendering
                         </li>
+                        <li><strong>interpolation</strong> <em>("basis","step","monotone",..)</em> : Customize the layout of a the line  <br><em style="font-weight:600">(Only for the "line" feature)</em>
+                        </li>
                     </ul>
-                    <p><strong>Note :</strong> Be carefull to specify different className for each type of feature</p>
+                    <p><strong>Note 1 :</strong> In case of <em>"line"</em> feature, you can add 2 arrays of data within an array (e.g. <em style="font-family:Courier;font-weight:500">data:[dataArray1,dataArray2]</em>), and 2 colors for each data within an array (e.g. <em style="font-family:Courier;font-weight:500">color:["#C50063","#005572"]</em>)</p>
+                    <p><strong>Note 2 :</strong> Be carefull to specify different className for each type of feature</p>
                 </div>
                 <form>
                 <textarea id="code2" name="code2" style="width:500px;max-height:200px;overflow:auto;font-size:11px;">
@@ -226,8 +244,12 @@ ft2.addFeature({
                     <h4 class="text-center">Events</h4>
                 </div>
                 <div class="panel-body">
-                    <p>You can listen for a click on a feature, and get the specific positions of this feature with the listener <strong>onFeatureSelected</strong>. <br>
-                        This method take a custom function in parameter allowing you to link this event with the rest of your application.</p>
+                    <p>You can listen for some events :</p>
+                    <ul>
+                        <li><strong>onFeatureSelected</strong> : A click on a feature, return an object with the specific positions of this feature</li>
+                        <li><strong>onZoom</strong> : When a zoom occurs, return an object with the coordinates and zoom level</li>
+                    </ul>
+                        <p>Those methods take a custom function (callback) in parameter, receiving the event object, allowing you to link the event with the rest of your application.</p>
                 </div>
                 <form>
                 <textarea id="code3" name="code3" style="width:500px;max-height:200px;overflow:auto;font-size:11px;">
@@ -295,7 +317,11 @@ ft3.addFeature({
 ft3.onFeatureSelected(function (d) {
     console.log(d.detail);
 });
-
+                        
+//Get and print in the browser console the zoom level and coordinates
+ft3.onZoom(function (d) {
+    console.log(d.detail);
+});
 
                 </textarea>
                 </form>
@@ -313,6 +339,120 @@ ft3.onFeatureSelected(function (d) {
         <div class="col-md-5 col-xs-12">
             <div class="panel panel-default">
                 <div class="panel-heading">
+                    <h4 class="text-center">Zoom</h4>
+                </div>
+                <div class="panel-body">
+                    <p>You can zoom into the feature viewer by selecting the area of interest with your mouse.<br>
+                    But you can also do it programmatically. <br>The feature-viewer has two methods for that : </p>
+                    <ul>
+                        <li><strong>zoom(start,end)</strong> : A function that will zoom on the coordinates passed in parameters. (<span style="font-family:monospace">start</span> must be > 0)</li>
+                        <li><strong>resetZoom()</strong> : A function that will reset the zoom.</li>
+                    </ul>
+                </div>
+                <form>
+                <textarea id="code4" name="code4" style="width:500px;max-height:200px;overflow:auto;font-size:11px;">
+//Create a new Feature Viewer and add some rendering options
+var ft4 = new FeatureViewer("FDSJKLFJDSFKLJDFHADJKLFHDSJKLFHDAFJKLDHFJKLDASFHDJKLFHDSAJKLFHDAKLFJDHSAFKLDLSNCDJKLFENFIUPERWDJKPCNVDFPIEHFDCFJDKOWFPDJWFKLXSJFDW9FIPUAENDCXAMSFNDUAFIDJFDLKSAFJDSAKFLJDSADJFDW9FIPUAENDCXAMSFNDAAAAAAAAAAAFJDSAKFL","#div4", {
+            showAxis: true,
+            showSequence: true,
+            brushActive: true,
+            toolbar:true,
+            bubbleHelp:true,
+            zoomMax:20
+        });
+
+//Add some features
+ft4.addFeature({
+    data: [{x:20,y:32},{x:46,y:100},{x:123,y:167}],
+    name: "test feature 1",
+    className: "test1",
+    color: "#787746",
+    type: "rect"
+});
+ft4.addFeature({
+    data: [{x:52,y:52},{x:92,y:92}],
+    name: "test feature 2",
+    className: "test2",
+    color: "#32331D",
+    type: "rect"
+});
+ft4.addFeature({
+    data: [{x:130,y:184},{x:40,y:142},{x:80,y:110}],
+    name: "test feature 3",
+    className: "test3",
+    color: "#B4AF91",
+    type: "path"
+});
+var dataDemo = [];
+for (var i=1;i<212;i++) {
+    var count = Math.floor((Math.random() * 20) + 1);
+    dataDemo.push({
+        x: i,
+        y:count
+    })
+}
+ft4.addFeature({
+    data: dataDemo,
+    name: "test feature 4",
+    className: "test4",
+    color: "#40411E",
+    type: "line",
+    filter: "type2",
+    height: "5"
+});
+
+ft4.addFeature({
+    data: [{x:120,y:154},{x:22,y:163},{x:90,y:108},{x:10,y:25},{x:193,y:210},{x:78,y:85},{x:96,y:143},{x:14,y:65},{x:56,y:167}],
+    name: "test feature 5",
+    className: "test5",
+    color: "#C03000",
+    height: 8,
+    type: "rect"
+});
+
+//Get and print in the browser console the position of the feature selected
+ft4.onFeatureSelected(function (d) {
+    console.log(d.detail);
+});
+                        
+//Get and print in the browser console the zoom level and coordinates
+ft4.onZoom(function (d) {
+    console.log(d.detail);
+});
+                        
+//functions to zoom programmatically
+zoomIn = function(){
+ ft4.zoom(40,80);      
+}
+zoomOut = function(){
+ ft4.resetZoom();      
+}
+
+//add buttons for programmatic zoom
+var buttonZoom = '<a class="btn btn-info btnZoom" onclick="zoomIn()">ZOOM between 40 and 80</a>';
+var buttonResetZoom = '<a class="btn btn-info btnZoom" onclick="zoomOut()">Reset ZOOM</a>';
+                        
+$("#div4").append("<p class='btnBlock'>"+buttonZoom+buttonResetZoom+"</p");
+                        
+
+
+                </textarea>
+                </form>
+                <button type="button" class="btn btn-default center-block" style="margin-bottom:20px;"
+                        onclick=executeCode("#div4",zoomCode)>Execute
+                </button>
+            </div>
+        </div>
+        <div class="col-md-6 col-md-offset-1 col-xs-12"
+             style="height:250px;vertical-align:top;margin-top:15px;">
+            <div id="div4">
+            </div>
+        </div>
+    </div>
+    <div class="row" style="margin-top: 30px;border-bottom:1px solid #E7EAEC;">
+        <div class="col-md-5 col-xs-12">
+            <div class="panel panel-default">
+                <div class="panel-heading">
                     <h4 class="text-center" style="color:#C50063;font-family:'Helvetica Neue';">Use  <img
                 src="http://www.nextprot.org/db/images/blueflat/np.png" style="width:25%;vertical-align:middle;padding:0px 10px 5px"> data</h4>
                 </div>
@@ -321,12 +461,12 @@ ft3.onFeatureSelected(function (d) {
                     <ul>
                         <li>First, find your protein of interest in NeXtProt and get the neXtProt accession (NX_...). (You can find your protein by entering an accession number of another database, like UniProt or Ensembl)</li>
                         <li>Then, check the type of feature in the <a href="https://api.nextprot.org/">NeXtProt API</a> that you would like to add to your viewer. For example, "propeptide" or "mature-protein".</li>
-                        <li>Include the feature viewer bundle with nextprot to your html <strong>feature-viewer.nextprot.js</strong> </li>
+                        <li>Include the feature viewer bundle with nextprot to your html : <strong>feature-viewer.nextprot.js</strong> </li>
                         <li>Finally, create your feature viewer like this :</li>
                     </ul>
                 </div>
                 <form>
-                <textarea id="code4" name="code4" style="width:500px;max-height:200px;overflow:auto;font-size:11px;">
+                <textarea id="code5" name="code5" style="width:500px;max-height:200px;overflow:auto;font-size:11px;">
 
 //initalize nextprot Client
 //please provide a name for your application
@@ -344,7 +484,7 @@ var options = {showAxis: true, showSequence: true,
    bubbleHelp: true, zoomMax:20 };
                     
 // Init nextprot feature viewer
-nxFeatureViewer(nx, isoform, "#div4", options)
+nxFeatureViewer(nx, isoform, "#div5", options)
     .then(function(ff){
     //(ff is here an instance of the feature viewer with few more methods)
     // Add first custom feature
@@ -395,13 +535,13 @@ nxFeatureViewer(nx, isoform, "#div4", options)
                 </textarea>
                 </form>
                 <button type="button" class="btn btn-default center-block" style="margin-bottom:20px;"
-                        onclick=executeCode("#div4",nextprot)>Execute
+                        onclick=executeCode("#div5",nextprot)>Execute
                 </button>
             </div>
         </div>
         <div class="col-md-6 col-md-offset-1 col-xs-12"
              style="height:250px;vertical-align:top;margin-top:15px;">
-            <div id="div4"></div>
+            <div id="div5"></div>
         </div>
     </div>
 </div>
@@ -413,6 +553,7 @@ nxFeatureViewer(nx, isoform, "#div4", options)
     var initSVG;
     var addFeatures;
     var eventCode;
+    var zoomCode;
     var nextprot;
 
     var executeCode = function (outputDiv, mirrorCode) {
@@ -438,7 +579,12 @@ nxFeatureViewer(nx, isoform, "#div4", options)
             lineNumbers: true,
             lineWrapping: true
         });
-        nextprot = CodeMirror.fromTextArea(code4, {
+        zoomCode = CodeMirror.fromTextArea(code4, {
+            mode: "javascript",
+            lineNumbers: true,
+            lineWrapping: true
+        });
+        nextprot = CodeMirror.fromTextArea(code5, {
             mode: "javascript",
             lineNumbers: true,
             lineWrapping: true
@@ -447,7 +593,8 @@ nxFeatureViewer(nx, isoform, "#div4", options)
             executeCode("#div1", initSVG);
             executeCode("#div2", addFeatures);
             executeCode("#div3", eventCode);
-            executeCode("#div4", nextprot);
+            executeCode("#div4", zoomCode);
+            executeCode("#div5", nextprot);
         });
     };
 

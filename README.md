@@ -4,7 +4,7 @@
 
 ![Feature viewer](/assets/FV_SCSHT.png)
 
-Live demo: https://cdn.rawgit.com/calipho-sib/feature-viewer/v0.1.35/examples/index.html
+Live demo: https://cdn.rawgit.com/calipho-sib/feature-viewer/v0.1.40/examples/index.html
 
 ## Getting Started
 
@@ -24,9 +24,9 @@ Note: that if you choose the later approach (by just using the feature-viewer.js
 <div id="fv1"></div>
 ```
 
-3) Create an instance of FeatureViewer in javascript with the sequence, the div in which it will be display and the rendering options of your choice.
+3) Create an instance of FeatureViewer in javascript with the sequence (or a length), the div in which it will be display and the rendering options of your choice.
 ```javascript
-//For Node add before : var FeatureViewer = require("feature-viewer"); //
+//For Node add before : var FeatureViewer = require("feature-viewer");
 
 var ft = new FeatureViewer('MALWMRLLPLLALLALWGPGPGAGSLQPLALEGSLQKRGIVEQCCTSICSLYQLE',
                            '#fv1',
@@ -38,6 +38,9 @@ var ft = new FeatureViewer('MALWMRLLPLLALLALWGPGPGAGSLQPLALEGSLQKRGIVEQCCTSICSLY
                                 bubbleHelp:true, 
                                 zoomMax:50 //define the maximum range of the zoom
                             });
+                            
+//Instead of a sequence, you can also initialize the feature viewer with a length (integer) :
+var ft = new FeatureViewer(213,'#fv1');
 ```
 
 4) Finally, add the features
@@ -58,9 +61,12 @@ ft.addFeature({
 
 ## Functionalities
 
-* Zoom into the Feature-viewer by selecting a part of the sequence with your mouse. Zoom out with a right-click.
+* Zoom into the Feature-viewer by selecting a part of the sequence with your mouse. Zoom out with a right-click.    
+You can also zoom programmatically with the methods **```zoom(start,end)```** and **```resetZoom()```**
+
 
 * A tooltip appears when the mouse is over a feature, giving its exact positions, and optionally, a description.
+ 
  
 * beside the positions for each element, you can also give a description & an ID, allowing you to link click event on the feature to the rest of your project.
 
@@ -73,12 +79,21 @@ ft.addFeature({
 * Bubble help 
 * Zoom max
 * Features height
+* Offset
 
-## Examples 
+## ClearInstance()
 
-https://search.nextprot.org/entry/NX_P01308/view/proteomics
+You may sometimes want to reload your feature-viewer with new parameters. To avoid memory leaks, the method **```clearInstance()```** will clear each element & listener for you before you delete the feature-viewer instance.
+
+
+## Documentation
+
+Check out this page for a better understanding of how to use the feature viewer and its possibilities :
+* https://cdn.rawgit.com/calipho-sib/feature-viewer/v0.1.40/examples/index.html
 
 ## Use it with NeXtProt API
+
+<img src="/assets/FVDemo.png" width="100%" />
 
 It is possible to fill the feature viewer with protein features from [NeXtProt](https://search.nextprot.org/), the human protein database.   
 
@@ -120,10 +135,10 @@ var styles = [
 ff.addNxFeature(["propeptide","mature-protein"], styles);
 
 ```
-## Documentation
 
-Check out this page for a better understanding of how to use the feature viewer and its possibilities :
-* https://cdn.rawgit.com/calipho-sib/feature-viewer/v0.1.35/examples/index.html
+## Examples 
+
+https://search.nextprot.org/entry/NX_P01308/view/proteomics
 
 ## Support
 
