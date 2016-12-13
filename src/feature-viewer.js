@@ -466,7 +466,8 @@ var FeatureViewer = (function () {
         }
 
         function updateSVGHeight(position) {
-            svg.attr("height", position + 60 + "px")
+            svg.attr("height", position + 60 + "px");
+            svg.select("clippath rect").attr("height", position + 60 + "px");
         }
 
         var yAxisScale = d3.scale.ordinal()
@@ -585,14 +586,14 @@ var FeatureViewer = (function () {
                     level = maxValue > level ? maxValue : level;
                     
 
-                    object.data[i] = [object.data[i].map(function (d) {
+                    object.data[i] = object.data[i].map(function (d) {
                         return {
                             x: d.x,
                             y: d.y,
                             id: d.id,
                             description: d.description
                         }
-                    })]
+                    });
                 }
                 lineYscale.range([0, -(shift)]).domain([0, -(level)]);
                 pathLevel = shift * 10 +5;
@@ -693,7 +694,8 @@ var FeatureViewer = (function () {
             },
             rectangle: function (object, position) {
                 //var rectShift = 20;
-                var rectHeight =(object.height) ? object.height : 12;
+                if (!object.height) object.height = 12;
+                var rectHeight = object.height;
                 
                 var rectShift = rectHeight + rectHeight/3;
                 var lineShift = rectHeight/2 - 6;
@@ -766,7 +768,7 @@ var FeatureViewer = (function () {
                     .style("z-index", "15")
                     .style("visibility", function (d) {
                         if (d.description) {
-                            return (scaling(d.y) - scaling(d.x)) > d.description.length * 8 ? "visible" : "hidden";
+                            return (scaling(d.y) - scaling(d.x)) > d.description.length * 8 && rectHeight > 11 ? "visible" : "hidden";
                         } else return "hidden";
                     })
                     .call(d3.helper.tooltip(object));
@@ -787,8 +789,8 @@ var FeatureViewer = (function () {
                 //    .call(d3.helper.tooltip(object));
 
                 forcePropagation(rectsProGroup);
-                var uniqueShift = level < 2 ? rectHeight-15 > 0 ? rectHeight-15 : 0 : 0;
-                Yposition += (level - 1) * (rectShift + lineShift + 1) + uniqueShift;
+                var uniqueShift = rectHeight > 12 ? rectHeight - 6 : 0;
+                Yposition += level < 2 ? uniqueShift : (level-1) * rectShift + uniqueShift;
             },
             unique: function (object, position) {
                 var rectsPro = svgContainer.append("g")
@@ -909,7 +911,7 @@ var FeatureViewer = (function () {
                     .style("stroke-width", "1px");
                 object.data.forEach(function(dd,i,array){
                     histog.selectAll("." + object.className + i)
-                    .data(dd)
+                    .data([dd])
                     .enter()
                     .append("path")
                     .attr("clip-path", "url(#clip)")
@@ -1051,7 +1053,7 @@ var FeatureViewer = (function () {
                 svgContainer.selectAll("." + object.className + "Text")
                     .style("visibility", function (d) {
                         if (d.description) {
-                            return (scaling(d.y) - scaling(d.x)) > d.description.length * 8 ? "visible" : "hidden";
+                            return (scaling(d.y) - scaling(d.x)) > d.description.length * 8 && object.height > 11 ? "visible" : "hidden";
                         } else return "hidden";
                     });
             },
@@ -1155,7 +1157,6 @@ var FeatureViewer = (function () {
                 }
                 transit
                     .attr("x", function (d, i) {
-//                        console.log(scaling(i+1+start));
                         return scaling(i + start)
                     });
             }
@@ -1220,7 +1221,6 @@ var FeatureViewer = (function () {
 
                 //modify scale
 //                scaling.range([5,width-5]);
-//                console.log(extent);
                 scaling.domain(extent);
                 scalingPosition.range(extent);
                 var currentShift = seqShift ? seqShift : offset.start;
@@ -1248,14 +1248,18 @@ var FeatureViewer = (function () {
                 //resetAll();
             }
         }
-        $(window).resize(function() {updateWindow()});
+//        
+        var resizeCallback = function(){
+            updateWindow();
+        }
+        $(window).on("resize", resizeCallback);
+        
         function updateWindow(){
 //            var new_width = $(div).width() - margin.left - margin.right - 17;
 //            var width_larger = (width < new_width);
             width = $(div).width() - margin.left - margin.right - 17;
             d3.select(div+" svg")
                 .attr("width", width + margin.left + margin.right);
-//            console.log(d3.select(div+" clippath>rect").attr("width"));
             d3.select(div+" clippath>rect").attr("width", width);
             if (SVGOptions.brushActive) {
                 d3.select(div+" .background").attr("width", width);
@@ -1269,7 +1273,6 @@ var FeatureViewer = (function () {
                 else if (seq === true && svgContainer.selectAll(".AA").empty()) {fillSVG.sequence(sequence.substring(current_extend.start-1, current_extend.end), 20, current_extend.start-1);}
             }
             
-//            console.log(current_extend);
             scaling.range([5,width-5]);
             scalingPosition.domain([0, width]);
             
@@ -1447,9 +1450,7 @@ var FeatureViewer = (function () {
             }
 
             if (options.toolbar === true) {
-                //console.log($(div + " .svgHeader").length);
                 var headerOptions = $(div + " .svgHeader").length ? d3.select(div + " .svgHeader") : d3.select(div).append("div").attr("class", "svgHeader");
-                //console.log(headerOptions);
 
                 if (!$(div + ' .header-zoom').length) {
                     var headerZoom = headerOptions
@@ -1650,7 +1651,7 @@ var FeatureViewer = (function () {
         }
         
         this.clearInstance = function (){
-            $(window).off("resize");
+            $(window).off("resize", resizeCallback);
             svg = null;
             svgElement = null;
             svgContainer = null;

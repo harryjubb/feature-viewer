@@ -1,14 +1,20 @@
-# Feature viewer
+# neXtProt - The knowledge resource on human proteins
+
+This is a code repository for the SIB - Swiss Institute of Bioinformatics CALIPHO group neXtProt project
+
+See: http://www.nextprot.org/
+
+# neXtProt feature viewer
 
 > The feature viewer is a super easy javascript library to use in order to draw the different features covering a sequence for a better visualization.
 
 ![Feature viewer](/assets/FV_SCSHT.png)
 
-Live demo: https://cdn.rawgit.com/calipho-sib/feature-viewer/v0.1.40/examples/index.html
+**Live demo** : https://cdn.rawgit.com/calipho-sib/feature-viewer/v0.1.44/examples/index.html
 
 ## Getting Started
 
-1) Include the library using bower or npm or simply by including the javascript feature-viewer.js
+**1.** You can get the library in your project using bower or npm
 ```
 //BOWER//
 bower install feature-viewer
@@ -17,14 +23,24 @@ bower install feature-viewer
 npm install feature-viewer
 ```
 
-Note: that if you choose the later approach (by just using the feature-viewer.js) you should also include the dependencies :  jquery,d3 and bootstrap.js / bootstrap.min.css
+Or Include the feature-viewer **JS** and **CSS** from rawgit CDN in the header of your html
+```html
+<link rel="stylesheet" type="text/css" href="https://cdn.rawgit.com/calipho-sib/feature-viewer/v0.1.44/dist/feature-viewer.min.css">
 
-2) Specify a div in your html
+<script src="https://cdn.rawgit.com/calipho-sib/feature-viewer/v0.1.44/dist/feature-viewer.bundle.js"></script>
+```
+
+**NOTE** : If you already got the dependencies (D3, Bootstrap & Jquery) in your project, use the simple minified version instead of the bundle :
+```html
+<script src="https://cdn.rawgit.com/calipho-sib/feature-viewer/v0.1.44/dist/feature-viewer.min.js"></script>
+```
+
+**2.** Specify a div in your html
 ```
 <div id="fv1"></div>
 ```
 
-3) Create an instance of FeatureViewer in javascript with the sequence (or a length), the div in which it will be display and the rendering options of your choice.
+**3.** Create an instance of FeatureViewer in javascript with the sequence (or a length), the div in which it will be display and the rendering options of your choice.
 ```javascript
 //For Node add before : var FeatureViewer = require("feature-viewer");
 
@@ -43,7 +59,7 @@ var ft = new FeatureViewer('MALWMRLLPLLALLALWGPGPGAGSLQPLALEGSLQKRGIVEQCCTSICSLY
 var ft = new FeatureViewer(213,'#fv1');
 ```
 
-4) Finally, add the features
+**4.** Finally, add the features
    ```javascript
 ft.addFeature({
        data: [{x:20,y:32},{x:46,y:100},{x:123,y:167}],
@@ -54,7 +70,7 @@ ft.addFeature({
    });
    ```
    
-5) Et voila!
+**5.** Et voila!
 
 ![Feature viewer](/assets/feature-viewer.png)
 
@@ -89,7 +105,7 @@ You may sometimes want to reload your feature-viewer with new parameters. To avo
 ## Documentation
 
 Check out this page for a better understanding of how to use the feature viewer and its possibilities :
-* https://cdn.rawgit.com/calipho-sib/feature-viewer/v0.1.40/examples/index.html
+* https://cdn.rawgit.com/calipho-sib/feature-viewer/v0.1.44/examples/index.html
 
 ## Use it with NeXtProt API
 
@@ -166,8 +182,6 @@ If you have any problem or suggestion please open an issue [here](https://github
 
 ## License 
 
-This software is licensed under the GNU GPL v2 license, quoted below.
-
 Copyright (c) 2015, SIB Swiss Institute of Bioinformatics
 
-
+This program is free software; you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation; either version 2 of the License, or (at your option) any later version.
